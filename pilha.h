@@ -4,11 +4,9 @@
 typedef struct RegistroVenda {
     int idCliente;
     int idLivro;
-    int idVendedor;
     int qtd;
     float total;
     char nomeLivro[50];
-    char nomeVendedor[50];
     struct RegistroVenda *prox;
 } RegistroVenda;
 

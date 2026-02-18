@@ -1,5 +1,5 @@
-// MÛdulo: cliente.c
-// Respons·vel por implementar a lista encadeada de clientes.
+// M√≥dulo: cliente.c
+// Respons√°vel por implementar a lista encadeada de clientes.
 // Permite buscar, listar e inserir clientes no sistema.
 
 #include <stdio.h>
@@ -7,24 +7,24 @@
 #include <string.h>
 #include "cliente.h"
 
-// FunÁ„o: clienteBuscar
+// Fun√ß√£o: clienteBuscar
 // Percorre a lista encadeada procurando um cliente pelo ID.
-// Retorna ponteiro para o cliente encontrado ou NULL se n„o existir.
+// Retorna ponteiro para o cliente encontrado ou NULL se n√£o existir.
 Cliente* clienteBuscar(Cliente *lista, int id) {
     while(lista != NULL) {
         if(lista->id == id)
             return lista; // Cliente encontrado
-        lista = lista->prox; // AvanÁa para o prÛximo nÛ
+        lista = lista->prox; // Avan√ßa para o pr√≥ximo n√≥
     }
-    return NULL; // Cliente n„o encontrado
+    return NULL; // Cliente n√£o encontrado
 }
 
-// FunÁ„o: clienteListar
+// Fun√ß√£o: clienteListar
 // Exibe todos os clientes cadastrados na lista.
 void clienteListar(Cliente *lista) {
     printf("\n=== CLIENTES ===\n");
 
-    // Verifica se a lista est· vazia
+    // Verifica se a lista esta vazia
     if(lista == NULL) {
         printf("(vazio)\n");
         return;
@@ -37,33 +37,55 @@ void clienteListar(Cliente *lista) {
     }
 }
 
-// FunÁ„o: clienteInserir
-// Insere um novo cliente no inÌcio da lista encadeada.
-// TambÈm verifica se o ID j· existe para evitar duplicaÁ„o.
+// Fun√ß√£o: clienteInserir
+// Insere um novo cliente no in√≠cio da lista encadeada.
+// Tamb√©m verifica se o ID j√° existe para evitar duplica√ß√£o.
 void clienteInserir(Cliente **lista) {
 
-    // Aloca memÛria para novo cliente
+    // Aloca mem√≥ria para novo cliente
     Cliente *novo = (Cliente*) malloc(sizeof(Cliente));
-    if(!novo) return; // Falha na alocaÁ„o
+    if(!novo) return; // Falha na aloca√ß√£o
 
     printf("ID Cliente: ");
     scanf("%d", &novo->id);
 
-    // Verifica se j· existe cliente com o mesmo ID
+    // Verifica se j√° existe cliente com o mesmo ID
     if(clienteBuscar(*lista, novo->id)) {
         printf("ID ja existe.\n");
-        free(novo); // Libera memÛria alocada
+        free(novo); // Libera mem√≥ria alocada
         return;
     }
 
     printf("Nome: ");
     scanf(" %[^\n]", novo->nome);
 
-    // InserÁ„o no inÌcio da lista (mais eficiente)
+    // Inser√ß√£o no inicio da lista (mais eficiente)
     novo->prox = *lista;
     *lista = novo;
 
     printf("Cliente cadastrado!\n");
 }
 
+void removerCliente(Cliente **lista, int id) {
+    Cliente *atual = *lista;
+    Cliente *anterior = NULL;
 
+    while(atual != NULL && atual->id != id) {
+        anterior = atual;
+        atual = atual->prox;
+    }
+
+    if(atual == NULL) {
+        printf("Cliente nao encontrado.\n");
+        return;
+    }
+
+    if(anterior == NULL) {
+        *lista = atual->prox;
+    } else {
+        anterior->prox = atual->prox;
+    }
+
+    free(atual);
+    printf("Cliente removido com sucesso!\n");
+}

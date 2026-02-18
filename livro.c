@@ -1,38 +1,38 @@
-// Módulo: livro.c
-// Implementação da lista encadeada de livros.
+// MÃ³dulo: livro.c
+// ImplementaÃ§Ã£o da lista encadeada de livros.
 // Permite buscar, listar e cadastrar livros no sistema.
-// Também mantém controle de estoque e quantidade vendida.
+// Tambm mantÃ©m controle de estoque e quantidade vendida.
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "livro.h"
 
-// Função: livroBuscar
+// FunÃ§Ã£o: livroBuscar
 // Percorre a lista encadeada procurando um livro pelo ID.
-// Retorna ponteiro para o livro encontrado ou NULL se não existir.
+// Retorna ponteiro para o livro encontrado ou NULL se nÃ£o existir.
 Livro* livroBuscar(Livro *lista, int id) {
     while(lista != NULL) {
         if(lista->id == id)
             return lista; // Livro encontrado
-        lista = lista->prox; // Avança para o próximo nó
+        lista = lista->prox; // Avana para o prximo n
     }
-    return NULL; // Livro não encontrado
+    return NULL; // Livro no encontrado
 }
 
-// Função: livroListar
+// FunÃ§Ã£o: livroListar
 // Exibe todos os livros cadastrados no sistema.
 void livroListar(Livro *lista) {
 
     printf("\n=== LIVROS ===\n");
 
-    // Verifica se a lista está vazia
+    // Verifica se a lista esta vazia
     if(lista == NULL) {
         printf("(vazio)\n");
         return;
     }
 
-    // Percorre toda a lista exibindo informações
+    // Percorre toda a lista exibindo informaÃ§Ãµes
     while(lista != NULL) {
         printf("ID:%d | %s | Genero:%s | Ano:%d | R$%.2f | Estoque:%d | Vendidos:%d\n",
                lista->id,
@@ -47,22 +47,22 @@ void livroListar(Livro *lista) {
     }
 }
 
-// Função: cadastrarLivro
-// Insere um novo livro no início da lista encadeada.
-// Também verifica se o ID já existe para evitar duplicidade.
+// FunÃ§Ã£o: cadastrarLivro
+// Insere um novo livro no inicio da lista encadeada.
+// Tambm verifica se o ID j existe para evitar duplicidade.
 void cadastrarLivro(Livro **lista) {
 
-    // Aloca memória para novo livro
+    // Aloca memÃ³ria para novo livro
     Livro *novo = (Livro*) malloc(sizeof(Livro));
-    if(!novo) return; // Falha na alocação
+    if(!novo) return; // Falha na alocaÃ§Ã£o
 
     printf("ID Livro: ");
     scanf("%d", &novo->id);
 
-    // Verifica se já existe livro com mesmo ID
+    // Verifica se jÃ¡ existe livro com mesmo ID
     if(livroBuscar(*lista, novo->id)) {
         printf("ID ja existe.\n");
-        free(novo); // Libera memória se ID duplicado
+        free(novo); // Libera memÃ³ria se ID duplicado
         return;
     }
 
@@ -84,7 +84,7 @@ void cadastrarLivro(Livro **lista) {
     // Inicializa controle de vendas
     novo->vendidos = 0;
 
-    // Inserção no início da lista (operação O(1))
+    // InserÃ§Ã£o no inicio da lista (operaÃ§Ã£o O(1))
     novo->prox = *lista;
     *lista = novo;
 

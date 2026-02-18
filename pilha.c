@@ -1,36 +1,36 @@
-// Módulo: pilha.c
-// Implementação da estrutura de dados Pilha .
-// Utilizada para armazenar o histórico de vendas.
-// Permite desfazer a última venda realizada.
+// Modulo: pilha.c
+// ImplementaÃ§Ã£o da estrutura de dados Pilha .
+// Utilizada para armazenar o histÃ³rico de vendas.
+// Permite desfazer a Ãºltima venda realizada.
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "pilha.h"
 
-// Função: pilhaInit
+// FunÃ§Ã£o: pilhaInit
 // Inicializa a pilha deixando o topo como NULL e tamanho zero.
 void pilhaInit(Pilha *p) {
     p->topo = NULL;  // Topo da pilha
     p->tam = 0;      // Quantidade de elementos
 }
 
-// Função: pilhaVazia
-// Verifica se a pilha está vazia.
-// Retorna 1 se vazia, 0 caso contrário.
+// FunÃ§Ã£o: pilhaVazia
+// Verifica se a pilha esta vazia.
+// Retorna 1 se vazia, 0 caso contrario.
 int pilhaVazia(Pilha *p) {
     return (p->topo == NULL);
 }
 
-// Função: pilhaPush
+// FunÃ§Ã£o: pilhaPush
 // Insere um novo registro de venda no topo da pilha.
-// Mantém a regra LIFO.
-// Retorna 1 se sucesso, 0 se falha na alocação.
+// Mantem a regra LIFO.
+// Retorna 1 se sucesso, 0 se falha na alocaÃ§Ã£o.
 int pilhaPush(Pilha *p, RegistroVenda reg) {
 
-    // Aloca memória para novo nó da pilha
+    // Aloca memï¿½ria para novo na da pilha
     RegistroVenda *novo = (RegistroVenda*) malloc(sizeof(RegistroVenda));
-    if(!novo) return 0; // Falha na alocação
+    if(!novo) return 0; // Falha na alocaÃ§Ã£o
 
     // Copia os dados do registro recebido
     *novo = reg;
@@ -45,51 +45,50 @@ int pilhaPush(Pilha *p, RegistroVenda reg) {
     return 1;
 }
 
-// Função: pilhaPop
+// FunÃ§Ã£o: pilhaPop
 // Remove o elemento do topo da pilha.
-// Retorna os dados removidos através do ponteiro 'out'.
+// Retorna os dados removidos atraves do ponteiro 'out'.
 // Retorna 1 se sucesso, 0 se pilha vazia.
 int pilhaPop(Pilha *p, RegistroVenda *out) {
 
-    // Verifica se a pilha está vazia
+    // Verifica se a pilha esta vazia
     if(pilhaVazia(p)) return 0;
 
     // Guarda o topo atual
     RegistroVenda *temp = p->topo;
 
-    // Atualiza o topo para o próximo elemento
+    // Atualiza o topo para o proximo elemento
     p->topo = temp->prox;
 
-    // Retorna os dados removidos se ponteiro for válido
+    // Retorna os dados removidos se ponteiro for valido
     if(out)
         *out = *temp;
 
-    free(temp); // Libera memória
+    free(temp); // Libera memoria
     p->tam--;   // Decrementa tamanho
 
     return 1;
 }
 
-// Função: pilhaMostrar
-// Exibe todos os registros da pilha do topo até a base.
-// Mostra o histórico em ordem inversa de inserção.
+// FunÃ§Ã£o: pilhaMostrar
+// Exibe todos os registros da pilha do topo ate a base.
+// Mostra o historico em ordem inversa de inserÃ§Ã£o.
 void pilhaMostrar(Pilha *p) {
 
     printf("\n=== HISTORICO ===\n");
 
-    // Verifica se a pilha está vazia
+    // Verifica se a pilha esta vazia
     if(pilhaVazia(p)) {
         printf("(vazio)\n");
         return;
     }
 
-    // Percorre do topo até o final
+    // Percorre do topo ate o final
     RegistroVenda *aux = p->topo;
     while(aux != NULL) {
-        printf("Cliente:%d | Livro:%s | Vendedor:%s | Qtd:%d | Total:R$%.2f\n",
+        printf("Cliente:%d | Livro:%s | Qtd:%d | Total:R$%.2f\n",
                aux->idCliente,
                aux->nomeLivro,
-               aux->nomeVendedor,
                aux->qtd,
                aux->total);
 
@@ -97,7 +96,7 @@ void pilhaMostrar(Pilha *p) {
     }
 }
 
-// Função: pilhaTamanho
+// FunÃ§Ã£o: pilhaTamanho
 // Retorna a quantidade atual de elementos na pilha.
 int pilhaTamanho(Pilha *p) {
     return p->tam;
