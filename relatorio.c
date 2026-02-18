@@ -1,80 +1,32 @@
-// Módulo: relatorio.c
-// Responsável por exibir relatórios do sistema.
+// MÃ³dulo: relatorio.c
+// ResponsÃ¡vel por exibir relatÃ³rios do sistema.
 // Aqui utilizamos:
-// - Arrays (para armazenar temporariamente os dados de vendas por vendedor)
-// - Percurso em lista encadeada (para encontrar top vendedor e top livro)
+// - Percurso em lista encadeada (para encontrar top livro)
 
 #include <stdio.h>
 #include <string.h>
 #include "relatorio.h"
 
-// Função: menuRelatorios
-// Exibe um submenu com relatórios do sistema.
-// Relatórios disponíveis:
-// 1) Vendas por vendedor (usando array)
-// 2) Top vendedor (maior totalVendas)
-// 3) Top livro (maior vendidos)
-void menuRelatorios(Vendedor *vendedores, Livro *livros) {
+// FunÃ§Ã£o: menuRelatorios
+// Exibe um submenu com relatÃ³rios do sistema.
+// RelatÃ³rios disponÃ­veis:
+// 1) Top livro (maior vendidos)
+void menuRelatorios(Livro *livros) {
 
     int op;
 
     do {
         printf("\n=== RELATORIOS ===\n");
-        printf("1 - Vendas por vendedor\n");
-        printf("2 - Top vendedor\n");
-        printf("3 - Top livro\n");
+        printf("1 - Top livro\n");
         printf("0 - Voltar\n");
 
         printf("Opcao: ");
         scanf("%d", &op);
 
-        // Opção 1: relatório de vendas por vendedor usando arrays
-        // Ideia: percorrer lista encadeada e copiar os dados para arrays,
-        // depois imprimir de forma organizada.
+        // OpÃ§Ã£o 1: encontra o livro mais vendido
         if(op == 1) {
 
-            int vendas[200];      // guarda o total de vendas de cada vendedor
-            char nomes[200][50];  // guarda o nome de cada vendedor
-            int i = 0;            // quantidade de vendedores copiados
-
-            // Percorre a lista de vendedores e armazena nos arrays
-            Vendedor *p = vendedores;
-            while(p != NULL && i < 200) {
-                vendas[i] = p->totalVendas;
-                strcpy(nomes[i], p->nome);
-                i++;
-                p = p->prox;
-            }
-
-            // Imprime os dados do array
-            for(int j = 0; j < i; j++) {
-                printf("%s - Itens vendidos: %d\n", nomes[j], vendas[j]);
-            }
-        }
-
-        // Opção 2: encontra o vendedor com maior número de vendas
-        else if(op == 2) {
-
-            Vendedor *top = NULL; // vai apontar para o vendedor com mais vendas
-            Vendedor *p = vendedores;
-
-            // Percorre a lista comparando totalVendas
-            while(p != NULL) {
-                if(top == NULL || p->totalVendas > top->totalVendas)
-                    top = p;
-                p = p->prox;
-            }
-
-            if(top)
-                printf("Top vendedor: %s (%d)\n", top->nome, top->totalVendas);
-            else
-                printf("Sem vendedores.\n");
-        }
-
-        // Opção 3: encontra o livro mais vendido (maior campo vendidos)
-        else if(op == 3) {
-
-            Livro *top = NULL; // vai apontar para o livro com mais vendas
+            Livro *top = NULL; // aponta para o livro mais vendido
             Livro *p = livros;
 
             // Percorre a lista comparando o campo 'vendidos'
@@ -90,7 +42,5 @@ void menuRelatorios(Vendedor *vendedores, Livro *livros) {
                 printf("Sem livros.\n");
         }
 
-    } while(op != 0); // sai quando o usuário escolher 0
+    } while(op != 0); // sai quando o usuÃ¡rio escolher 0
 }
-
-

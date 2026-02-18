@@ -1,9 +1,8 @@
 // Módulo: venda.c
 // Este módulo integra as principais estruturas do sistema:
 // - Fila (FIFO): controla a ordem de atendimento dos clientes
-// - Listas encadeadas: armazenam clientes, vendedores e livros
+// - Listas encadeadas: armazenam clientes e livros
 // - Pilha (LIFO): registra o histórico de vendas e permite desfazer a última operação
-//
 // Também contém os submenus:
 // - menuCadastros
 // - menuFila (entrada na fila e atendimento/venda)
@@ -15,7 +14,6 @@
 #include "venda.h"
 #include "livro.h"
 #include "cliente.h"
-#include "vendedor.h"
 #include "fila.h"
 #include "pilha.h"
 
@@ -25,9 +23,8 @@
 // Cada compra realizada:
 // - reduz estoque do livro
 // - incrementa vendidos do livro
-// - incrementa totalVendas do vendedor
 // - salva um RegistroVenda na pilha de histórico (para permitir desfazer)
-static void atenderProximo(Fila *fila, Cliente *clientes, Livro *livros, Vendedor *vendedores, Pilha *historico) {
+static void atenderProximo(Fila *fila, Cliente *clientes, Livro *livros, Pilha *historico) {
 
     // 1) Pega o primeiro cliente da fila (FIFO)
     int idCliente;
@@ -43,65 +40,46 @@ static void atenderProximo(Fila *fila, Cliente *clientes, Livro *livros, Vendedo
         return;
     }
 
-    // 3) Escolhe o vendedor que vai atender (pode variar a cada atendimento)
-    int idVendedor;
-    printf("ID do vendedor que vai atender: ");
-    scanf("%d", &idVendedor);
-
-    // 4) Busca o vendedor na lista encadeada
-    Vendedor *v = vendedorBuscar(vendedores, idVendedor);
-    if(!v) {
-        printf("Vendedor nao existe!\n");
-        return;
-    }
-
     printf("\nCliente da vez: %s\n", c->nome);
 
-    // 5) Loop de compras: o cliente pode comprar vários livros até digitar 0
+    // 3) Loop de compras
     while(1) {
         int idLivro;
         printf("\nID do livro (0 para finalizar): ");
         scanf("%d", &idLivro);
 
-        // 0 encerra o atendimento do cliente
         if(idLivro == 0) break;
 
-        // 6) Busca o livro na lista encadeada
+        // 4) Busca o livro
         Livro *l = livroBuscar(livros, idLivro);
         if(!l) {
             printf("Livro nao existe!\n");
             continue;
         }
 
-        // 7) Solicita a quantidade a comprar
+        // 5) Pergunta a quantidade desejada
         int qtd;
         printf("Quantidade: ");
         scanf("%d", &qtd);
 
-        // Validação: quantidade positiva e estoque suficiente
         if(qtd <= 0 || l->quantidade < qtd) {
             printf("Quantidade invalida ou estoque insuficiente!\n");
             continue;
         }
 
-        // 8) Atualiza estoque e contadores
-        l->quantidade -= qtd;      // diminui estoque
-        l->vendidos += qtd;        // aumenta vendidos do livro
-        v->totalVendas += qtd;     // aumenta vendas do vendedor
+        // 6) Atualiza dados do livro
+        l->quantidade -= qtd;
+        l->vendidos += qtd;
 
-        // 9) Monta o registro da venda e empilha no histórico (Pilha = LIFO)
+        // 7) Registro da venda (pilha)
         RegistroVenda reg;
         reg.idCliente = idCliente;
         reg.idLivro = idLivro;
-        reg.idVendedor = idVendedor;
         reg.qtd = qtd;
         reg.total = l->preco * qtd;
 
-        // Armazena nomes no registro para facilitar exibição do histórico
         strcpy(reg.nomeLivro, l->nome);
-        strcpy(reg.nomeVendedor, v->nome);
 
-        // Empilha a venda para permitir "desfazer a última"
         pilhaPush(historico, reg);
 
         printf("Venda OK: %s x%d (R$%.2f)\n", l->nome, qtd, reg.total);
@@ -110,45 +88,43 @@ static void atenderProximo(Fila *fila, Cliente *clientes, Livro *livros, Vendedo
     printf("Atendimento finalizado.\n");
 }
 
-// Função interna (static): entrarFila
-// Permite inserir clientes já cadastrados na fila de atendimento.
-// O usuário digita vários IDs e encerra digitando 0.
 static void entrarFila(Fila *fila, Cliente *clientes) {
 
     int id;
-    printf("ID do cliente (0 para parar): ");
+    printf("Digite o ID do cliente para entrar na fila (0 para parar): ");
     scanf("%d", &id);
 
-    // Enquanto o usuário não digitar 0, tenta colocar o cliente na fila
     while(id != 0) {
 
-        // Só entra na fila se o cliente existir no cadastro
-        if(clienteBuscar(clientes, id)) {
-            filaEnfileirar(fila, id);
-            printf("Cliente %d entrou na fila.\n", id);
-        } else {
+        // 1) Verifica se o cliente existe
+        if(!clienteBuscar(clientes, id)) {
             printf("Cliente nao cadastrado.\n");
         }
+        // 2) Cliente existe → tenta colocar na fila
+        else if(!filaEnfileirar(fila, id)) {
+            printf("Cliente ja esta na fila.\n");
+        }
+        // 3) Entrou com sucesso
+        else {
+            printf("Cliente %d entrou na fila.\n", id);
+        }
 
-        printf("ID do cliente (0 para parar): ");
+        printf("Digite o ID do cliente para entrar na fila (0 para parar): ");
         scanf("%d", &id);
     }
 }
 
+
 // Função: menuCadastros
-// Submenu responsável por cadastrar e listar:
-// - clientes
-// - vendedores
-// - livros
-void menuCadastros(Livro **livros, Cliente **clientes, Vendedor **vendedores) {
+void menuCadastros(Livro **livros, Cliente **clientes) {
 
     int op;
     do {
         printf("\n=== CADASTROS ===\n");
         printf("1 - Cadastrar Cliente\n");
-        printf("2 - Cadastrar Vendedor\n");
-        printf("3 - Cadastrar Livro\n");
-        printf("4 - Listar tudo\n");
+        printf("2 - Cadastrar Livro\n");
+        printf("3 - Listar tudo\n");
+        printf("4 - Remover Cliente\n");
         printf("0 - Voltar\n");
 
         printf("Opcao: ");
@@ -158,33 +134,31 @@ void menuCadastros(Livro **livros, Cliente **clientes, Vendedor **vendedores) {
             clienteInserir(clientes);
 
         else if(op == 2)
-            vendedorInserir(vendedores);
+            cadastrarLivro(livros);
 
-        else if(op == 3)
-            cadastrarLivro(livros); // cadastra um novo livro na lista
-
-        else if(op == 4) {
-            // Listagem completa para conferência dos dados
+        else if(op == 3) {
             clienteListar(*clientes);
-            vendedorListar(*vendedores);
             livroListar(*livros);
+        }
+        else if(op == 4) {
+            int id;
+            printf("ID do cliente a remover: ");
+            scanf("%d", &id);
+            removerCliente(clientes, id);
         }
 
     } while(op != 0);
 }
 
 // Função: menuFila
-// Submenu responsável por:
-// 1) adicionar clientes na fila
-// 2) atender o próximo cliente e realizar compras/venda
-void menuFila(Fila *fila, Cliente *clientes, Livro *livros, Vendedor *vendedores, Pilha *historico) {
+void menuFila(Fila *fila, Cliente *clientes, Livro *livros, Pilha *historico) {
 
     int op;
     do {
-        printf("\n=== FILA ===\n");
+        printf("\n=== (FILA FIFO) ===\n");
         printf("Aguardando: %d\n", filaTamanho(fila));
-        printf("1 - Entrar na fila\n");
-        printf("2 - Atender proximo (faz venda)\n");
+        printf("1 - Entrar na fila (Cliente)\n");
+        printf("2 - Atender cliente (faz venda)\n");
         printf("0 - Voltar\n");
 
         printf("Opcao: ");
@@ -194,16 +168,13 @@ void menuFila(Fila *fila, Cliente *clientes, Livro *livros, Vendedor *vendedores
             entrarFila(fila, clientes);
 
         else if(op == 2)
-            atenderProximo(fila, clientes, livros, vendedores, historico);
+            atenderProximo(fila, clientes, livros, historico);
 
     } while(op != 0);
 }
 
 // Função: menuHistorico
-// Submenu responsável por:
-// 1) mostrar histórico de vendas (pilha)
-// 2) desfazer a última venda (pop da pilha e estorna os dados)
-void menuHistorico(Pilha *historico, Livro *livros, Vendedor *vendedores) {
+void menuHistorico(Pilha *historico, Livro *livros) {
 
     int op;
     do {
@@ -215,29 +186,20 @@ void menuHistorico(Pilha *historico, Livro *livros, Vendedor *vendedores) {
         printf("Opcao: ");
         scanf("%d", &op);
 
-        // Mostra todas as vendas registradas na pilha
         if(op == 1)
             pilhaMostrar(historico);
 
-        // Desfaz a última venda realizada (LIFO)
         else if(op == 2) {
 
             RegistroVenda reg;
 
-            // Remove do topo da pilha
             if(pilhaPop(historico, &reg)) {
 
-                // Busca livro e vendedor para reverter a operação
                 Livro *l = livroBuscar(livros, reg.idLivro);
-                Vendedor *v = vendedorBuscar(vendedores, reg.idVendedor);
 
-                // Estorna: devolve estoque e ajusta contadores
                 if(l) {
                     l->quantidade += reg.qtd;
                     l->vendidos -= reg.qtd;
-                }
-                if(v) {
-                    v->totalVendas -= reg.qtd;
                 }
 
                 printf("Desfeito: %s x%d\n", reg.nomeLivro, reg.qtd);
@@ -249,5 +211,3 @@ void menuHistorico(Pilha *historico, Livro *livros, Vendedor *vendedores) {
 
     } while(op != 0);
 }
-
-
