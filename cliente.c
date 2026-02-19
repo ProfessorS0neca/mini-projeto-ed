@@ -66,10 +66,13 @@ void clienteInserir(Cliente **lista) {
     printf("Cliente cadastrado!\n");
 }
 
+
+// Função: removerCliente
+// Remove um cliente da lista encadeada pelo ID.
 void removerCliente(Cliente **lista, int id) {
     Cliente *atual = *lista;
     Cliente *anterior = NULL;
-
+    
     while(atual != NULL && atual->id != id) {
         anterior = atual;
         atual = atual->prox;
@@ -89,3 +92,4 @@ void removerCliente(Cliente **lista, int id) {
     free(atual);
     printf("Cliente removido com sucesso!\n");
 }
+
