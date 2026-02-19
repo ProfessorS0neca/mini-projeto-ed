@@ -10,6 +10,8 @@ typedef struct Cliente {
 Cliente* clienteBuscar(Cliente *lista, int id);
 void clienteListar(Cliente *lista);
 void clienteInserir(Cliente **lista);
+void removerCliente(Cliente **lista, int id);
 
 #endif
+
 
