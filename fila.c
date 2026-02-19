@@ -23,8 +23,10 @@ int filaVazia(Fila *f) {
 
 // Função: filaEnfileirar
 // Insere um novo cliente no final da fila.
-// Mantém a regra FIFO (ordem de chegada).
-// Retorna 1 se sucesso, 0 se falha na alocação.
+// Antes de inserir, verifica se o cliente já está na fila.
+// Retorna 1 se inseriu com sucesso.
+// Retorna 0 se o cliente já estiver na fila ou se houver falha na alocação.
+
 int filaEnfileirar(Fila *f, int idCliente) {
 
     NoFila *p = f->ini;
@@ -89,5 +91,6 @@ int filaDesenfileirar(Fila *f, int *idOut) {
 int filaTamanho(Fila *f) {
     return f->tam;
 }
+
 
 
